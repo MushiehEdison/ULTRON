@@ -1,0 +1,18 @@
+# STT
+faster-whisper
+sounddevice
+
+# Intent parsing
+anthropic
+
+# Automation
+pyautogui
+pywinauto; sys_platform == 'win32'
+pyobjc; sys_platform == 'darwin'
+python-xlib; sys_platform == 'linux'
+
+# GUI
+PyQt6
+
+# Testing
+pytest
