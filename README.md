@@ -76,6 +76,18 @@ Each module (STT, intent parser, router, per-OS adapters, GUI) is owned by one c
 - Destructive actions (delete, system setting changes) require confirmation.
 - Every executed command is logged.
 
+## Download
+
+| Platform | |
+|---|---|
+| 🪟 Windows | [Download ULTRON.exe](https://github.com/MushiehEdison/ULTRON/releases/latest/download/ULTRON.exe) |
+| 🐧 Linux (Fedora/RPM) | [Download ultron.rpm](https://github.com/MushiehEdison/ULTRON/releases/latest/download/ultron.rpm) |
+| 🍎 macOS | [Download ULTRON.dmg](https://github.com/MushiehEdison/ULTRON/releases/latest/download/ULTRON.dmg) |
+
+See [all releases](https://github.com/MushiehEdison/ULTRON/releases) for changelogs and older versions.
+
+[![Latest release](https://img.shields.io/github/v/release/MushiehEdison/ULTRON)](https://github.com/MushiehEdison/ULTRON/releases/latest)
+
 ## License
 
 TBD
