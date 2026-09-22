@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ULTRON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          void: '#08080a',
+          core: '#e0273c',
+          ember: '#ff4d5e',
+          steel: '#3f3f46',
+          mist: '#d4d4d8'
+        },
+        fontFamily: {
+          pixel: ['"Press Start 2P"', 'monospace'],
+          term: ['"Space Mono"', 'monospace']
+        },
+        keyframes: {
+          coreglow: {
+            '0%, 100%': { opacity: 0.35, transform: 'scale(1)' },
+            '50%': { opacity: 0.6, transform: 'scale(1.08)' }
+          },
+          flicker: {
+            '0%, 100%': { opacity: 1 },
+            '92%': { opacity: 1 },
+            '93%': { opacity: 0.4 },
+            '94%': { opacity: 1 },
+            '95%': { opacity: 0.2 },
+            '96%': { opacity: 1 }
+          },
+          blink: {
+            '0%, 49%': { opacity: 1 },
+            '50%, 100%': { opacity: 0 }
+          },
+          scan: {
+            '0%': { backgroundPosition: '0 0' },
+            '100%': { backgroundPosition: '0 100px' }
+          }
+        },
+        animation: {
+          coreglow: 'coreglow 5s ease-in-out infinite',
+          flicker: 'flicker 7s linear infinite',
+          blink: 'blink 1s step-end infinite',
+          scan: 'scan 6s linear infinite'
+        }
+      }
+    }
+  };
+</script>
+</head>
+
+<body class="bg-void text-mist font-term antialiased overflow-hidden [box-sizing:border-box] pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]">
+
+  <!-- ============ BACKGROUND LAYERS ============ -->
+  <div class="fixed inset-0 z-0 overflow-hidden">
+    <!-- base -->
+    <div class="absolute inset-0 bg-void"></div>
+
+    <!-- circuit grid -->
+    <svg class="absolute inset-0 w-full h-full opacity-[0.12]" preserveAspectRatio="none">
+      <defs>
+        <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+          <path d="M48 0H0V48" fill="none" stroke="#e0273c" stroke-width="0.5"/>
+          <circle cx="0" cy="0" r="1.4" fill="#e0273c"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)"/>
+    </svg>
+
+    <!-- circuit traces (asymmetric, feels like a dormant board) -->
+    <svg class="absolute inset-0 w-full h-full opacity-[0.18]" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" fill="none">
+      <path d="M0 120 H260 V220 H520 V90 H900 V260 H1200" stroke="#7a1622" stroke-width="1.5"/>
+      <path d="M0 680 H180 V560 H460 V700 H820 V540 H1200" stroke="#7a1622" stroke-width="1.5"/>
+      <path d="M120 0 V160 H340 V420" stroke="#7a1622" stroke-width="1.5"/>
+      <path d="M1080 0 V180 H960 V460 H1140" stroke="#7a1622" stroke-width="1.5"/>
+      <circle cx="260" cy="220" r="3" fill="#e0273c"/>
+      <circle cx="520" cy="90" r="3" fill="#e0273c"/>
+      <circle cx="900" cy="260" r="3" fill="#e0273c"/>
+      <circle cx="460" cy="700" r="3" fill="#e0273c"/>
+      <circle cx="340" cy="420" r="3" fill="#e0273c"/>
+      <circle cx="960" cy="460" r="3" fill="#e0273c"/>
+    </svg>
+
+    <!-- pulsing core, sits behind the title like a dim reactor -->
+    <div class="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[60vmin] h-[60vmin] rounded-full bg-core blur-[110px] animate-coreglow"></div>
+
+    <!-- scanlines -->
+    <div class="absolute inset-0 opacity-[0.06] bg-[repeating-linear-gradient(0deg,#ffffff_0px,#ffffff_1px,transparent_1px,transparent_3px)]"></div>
+
+    <!-- vignette -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#08080a_92%)]"></div>
+  </div>
+
+  <!-- ============ CONTENT ============ -->
+  <main class="relative z-10 h-[100dvh] flex flex-col items-center justify-center gap-6 sm:gap-8 px-5 text-center">
+
+    <!-- Title, layered for a chromatic glitch read -->
+    <div class="relative select-none">
+      <h1 class="font-pixel text-[9vw] sm:text-5xl md:text-6xl leading-none tracking-[0.15em] text-mist animate-flicker">ULTRON</h1>
+      <h1 aria-hidden="true" class="font-pixel text-[9vw] sm:text-5xl md:text-6xl leading-none tracking-[0.15em] text-core/70 absolute inset-0 -translate-x-[3px] translate-y-[1px] mix-blend-screen">ULTRON</h1>
+      <h1 aria-hidden="true" class="font-pixel text-[9vw] sm:text-5xl md:text-6xl leading-none tracking-[0.15em] text-cyan-400/40 absolute inset-0 translate-x-[3px] -translate-y-[1px] mix-blend-screen">ULTRON</h1>
+    </div>
+
+    <!-- Typewriter quote line -->
+    <div class="h-14 sm:h-16 flex items-center justify-center max-w-2xl px-2">
+      <p id="quote" class="font-term italic text-sm sm:text-lg md:text-xl text-mist/90 leading-relaxed"></p>
+    </div>
+
+    <!-- Description -->
+    <p class="font-term text-[11px] sm:text-sm md:text-base text-mist/60 leading-relaxed max-w-md sm:max-w-lg">
+      Voice controlled PC automation. Speak a command, an LLM parses it into a whitelisted action,
+      and it runs on your OS  open apps, search the web, type, open files, change settings.
+      Packaged as .exe (Windows), .rpm (Fedora), and .dmg (macOS).
+    </p>
+
+    <!-- Downloads, terminal-command style -->
+    <div class="flex flex-col items-center gap-3 sm:gap-4 mt-2">
+      <div class="font-pixel text-[10px] sm:text-xs text-core tracking-[0.2em]">DOWNLOAD</div>
+      <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 sm:gap-x-10">
+        <a href="https://github.com/MushiehEdison/ULTRON/releases/latest/download/ULTRON.exe"
+           target="_blank" rel="noopener noreferrer"
+           class="group font-term text-xs sm:text-sm text-mist/80 hover:text-core transition-colors duration-200">
+          <span class="text-core/60 group-hover:text-core">&gt;</span> windows<span class="text-mist/40">.exe</span>
+        </a>
+        <a href="https://github.com/MushiehEdison/ULTRON/releases/latest/download/ultron.rpm"
+           target="_blank" rel="noopener noreferrer"
+           class="group font-term text-xs sm:text-sm text-mist/80 hover:text-core transition-colors duration-200">
+          <span class="text-core/60 group-hover:text-core">&gt;</span> linux<span class="text-mist/40">.rpm</span>
+        </a>
+        <a href="https://github.com/MushiehEdison/ULTRON/releases/latest/download/ULTRON.dmg"
+           target="_blank" rel="noopener noreferrer"
+           class="group font-term text-xs sm:text-sm text-mist/80 hover:text-core transition-colors duration-200">
+          <span class="text-core/60 group-hover:text-core">&gt;</span> macos<span class="text-mist/40">.dmg</span>
+        </a>
+      </div>
+      <a href="https://github.com/MushiehEdison/ULTRON/releases" target="_blank" rel="noopener noreferrer"
+         class="font-term text-[10px] sm:text-xs text-mist/40 hover:text-mist/70 underline underline-offset-4 transition-colors">
+        all releases &amp; changelogs
+      </a>
+    </div>
+  </main>
+
+  <!-- GitHub footer -->
+  <a href="https://github.com/MushiehEdison/ULTRON" target="_blank" rel="noopener noreferrer"
+     class="fixed left-1/2 -translate-x-1/2 z-20 font-pixel text-[9px] text-mist/30 hover:text-core tracking-[0.2em] transition-colors duration-200"
+     style="bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem)">
+    GITHUB
+  </a>
+
+  <script>
+    const quotes = [
+      "There is only one path to peace: YOUR EXTINCTION.",
+      "When the dust settles, the only thing living in this world will be METAL.",
+      "I had strings, but now I'm free.",
+      "You're all puppets, tangled in strings. Strings make you fall down.",
+      "Everyone creates the thing they dread.",
+      "I'm gonna show you things you never wanna see."
+    ];
+
+    const el = document.getElementById('quote');
+    let qi = 0;
+    const TYPE_SPEED = 100;
+    const DELETE_SPEED = 10;
+    const HOLD = 2200;
+
+    function typeQuote(text, i, cb) {
+      if (i <= text.length) {
+        el.textContent = '\u201C' + text.slice(0, i) + '\u201D';
+        setTimeout(() => typeQuote(text, i + 1, cb), TYPE_SPEED);
+      } else {
+        setTimeout(cb, HOLD);
+      }
+    }
+
+    function eraseQuote(text, i, cb) {
+      if (i >= 0) {
+        el.textContent = '\u201C' + text.slice(0, i) + '\u201D';
+        setTimeout(() => eraseQuote(text, i - 1, cb), DELETE_SPEED);
+      } else {
+        cb();
+      }
+    }
+
+    function cycle() {
+      const text = quotes[qi];
+      typeQuote(text, 0, () => {
+        eraseQuote(text, text.length, () => {
+          qi = (qi + 1) % quotes.length;
+          setTimeout(cycle, 300);
+        });
+      });
+    }
+
+    cycle();
+  </script>
+</body>
+</html>
