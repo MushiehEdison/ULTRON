@@ -122,13 +122,13 @@ class LinuxAdapter(AutomationAdapter):
             cmd = args
         else:
             cmd = ["sudo", "-n"] + args if password is None else ["sudo", "-S"] + args
-            return subprocess.run(
-        cmd,
-        input=(password + "\n") if password else None,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-    )
+        return subprocess.run(
+            cmd,
+            input=(password + "\n") if password else None,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
 
     @staticmethod
     def _run(args: Union[str, list], shell: bool = False,
@@ -150,11 +150,11 @@ class LinuxAdapter(AutomationAdapter):
         if "DISPLAY" not in env and os.path.exists("/tmp/.X11-unix"):
             env.setdefault("DISPLAY", ":0")
             env.setdefault("XAUTHORITY", str(Path.home() / ".Xauthority"))
-            return env
+        return env
 
-        # ------------------------------------------------------------------ #
-        # Original methods (kept intact)
-        # ------------------------------------------------------------------ #
+    # ------------------------------------------------------------------ #
+    # Original methods (kept intact)
+    # ------------------------------------------------------------------ #
     def open_app(self, name: str) -> dict:
         key = name.strip().lower()
         command = APP_MAP.get(key, key)
@@ -175,12 +175,12 @@ class LinuxAdapter(AutomationAdapter):
             return self.error(f"Could not search in {app}: {exc}")
 
     def type_text(self, text: str) -> dict:
-import pyautogui
-try:
-    pyautogui.write(text, interval=0.02)
-        return self.ok("Text typed")
-except Exception as exc:
-    return self.error(f"Could not type text: {exc}")
+        import pyautogui
+        try:
+            pyautogui.write(text, interval=0.02)
+            return self.ok("Text typed")
+        except Exception as exc:
+            return self.error(f"Could not type text: {exc}")
 
     def open_file(self, path: str) -> dict:
         try:
@@ -219,20 +219,20 @@ except Exception as exc:
         try:
             if admin:
                 proc = self._sudo([shell, "-c", command],
-                password=password, timeout=timeout)
+                                   password=password, timeout=timeout)
             else:
                 proc = self._run([shell, "-c", command], timeout=timeout)
 
-                return self.ok(
-            f"Command exited with {proc.returncode}",
-            stdout=proc.stdout.strip() if proc.stdout else "",
-            stderr=proc.stderr.strip() if proc.stderr else "",
-            returncode=proc.returncode,
-        )
+            return self.ok(
+                f"Command exited with {proc.returncode}",
+                stdout=proc.stdout.strip() if proc.stdout else "",
+                stderr=proc.stderr.strip() if proc.stderr else "",
+                returncode=proc.returncode,
+            )
         except subprocess.TimeoutExpired:
             return self.error("Command timed out")
-    except Exception as exc:
-        return self.error(f"Command failed: {exc}")
+        except Exception as exc:
+            return self.error(f"Command failed: {exc}")
 
     def kill_process(self, name_or_pid: Union[str, int],
     force: bool = True, admin: bool = False) -> dict:
@@ -242,13 +242,13 @@ except Exception as exc:
                 args = ["kill", sig, str(name_or_pid)]
             else:
                 args = ["pkill", sig, "-f", name_or_pid]
-                if admin:
-                    proc = self._sudo(args)
-                else:
-                    proc = self._run(args)
-                    if proc.returncode == 0:
-                        return self.ok(f"Killed {name_or_pid}")
-                    return self.error(proc.stderr.strip() or "kill failed")
+            if admin:
+                proc = self._sudo(args)
+            else:
+                proc = self._run(args)
+            if proc.returncode == 0:
+                return self.ok(f"Killed {name_or_pid}")
+            return self.error(proc.stderr.strip() or "kill failed")
         except Exception as exc:
             return self.error(f"Could not kill process: {exc}")
 
@@ -269,7 +269,7 @@ except Exception as exc:
                     "mem": parts[3],
                     "user": parts[4],
                 })
-                return self.ok(f"{len(rows)} processes", processes=rows)
+            return self.ok(f"{len(rows)} processes", processes=rows)
         except Exception as exc:
             return self.error(f"Could not list processes: {exc}")
 
@@ -291,14 +291,14 @@ except Exception as exc:
             args = ["systemctl"]
             if user:
                 args.append("--user")
-                args += [action, name]
-                if not user:
-                    proc = self._sudo(args)
-                else:
-                    proc = self._run(args)
-                    if proc.returncode == 0:
-                        return self.ok(f"Service {name} {action}ed")
-                    return self.error(proc.stderr.strip() or f"systemctl {action} failed")
+            args += [action, name]
+            if not user:
+                proc = self._sudo(args)
+            else:
+                proc = self._run(args)
+            if proc.returncode == 0:
+                return self.ok(f"Service {name} {action}ed")
+            return self.error(proc.stderr.strip() or f"systemctl {action} failed")
         except Exception as exc:
             return self.error(f"Service {action} failed: {exc}")
 
@@ -325,13 +325,14 @@ except Exception as exc:
                 cmd = [c for c in cmd if c]
                 proc = subprocess.run(
                     cmd, input=content, text=True, capture_output=True)
-                    if proc.returncode != 0:
-                        return self.error(proc.stderr.strip() or "sudo write failed")
-                    else:
-                        mode = "a" if append else "w"
-                        with p.open(mode, encoding=encoding) as f:
-                            f.write(content)
-                            return self.ok(f"Wrote {path}")
+                if proc.returncode != 0:
+                    return self.error(proc.stderr.strip() or "sudo write failed")
+                return self.ok(f"Wrote {path}")
+
+            mode = "a" if append else "w"
+            with p.open(mode, encoding=encoding) as f:
+                f.write(content)
+            return self.ok(f"Wrote {path}")
         except Exception as exc:
             return self.error(f"Could not write {path}: {exc}")
 
@@ -345,11 +346,11 @@ except Exception as exc:
                 proc = self._run(["gio", "trash", str(p)])
                 if proc.returncode == 0:
                     return self.ok(f"Trashed {path}")
-                if p.is_dir():
-                    shutil.rmtree(p)
-                else:
-                    p.unlink()
-                    return self.ok(f"Deleted {path}")
+            if p.is_dir():
+                shutil.rmtree(p)
+            else:
+                p.unlink()
+            return self.ok(f"Deleted {path}")
         except Exception as exc:
             return self.error(f"Could not delete {path}: {exc}")
 
@@ -366,7 +367,7 @@ except Exception as exc:
                 shutil.copytree(src, dst, dirs_exist_ok=True)
             else:
                 shutil.copy2(src, dst)
-                return self.ok(f"Copied {src} -> {dst}")
+            return self.ok(f"Copied {src} -> {dst}")
         except Exception as exc:
             return self.error(f"Copy failed: {exc}")
 
@@ -379,7 +380,7 @@ except Exception as exc:
                     "is_dir": e.is_dir(),
                     "size": e.stat().st_size if e.is_file() else None,
                 })
-                return self.ok(f"{len(entries)} entries", entries=entries)
+            return self.ok(f"{len(entries)} entries", entries=entries)
         except Exception as exc:
             return self.error(f"List failed: {exc}")
 
@@ -407,75 +408,75 @@ except Exception as exc:
         # Input simulation (keyboard / mouse)
         # ------------------------------------------------------------------ #
     def press_keys(self, *keys: str, interval: float = 0.05) -> dict:
-import pyautogui
-try:
-    pyautogui.hotkey(*keys, interval=interval)
-    return self.ok(f"Pressed {'+'.join(keys)}")
-except Exception as exc:
-    return self.error(f"Key press failed: {exc}")
+        import pyautogui
+        try:
+            pyautogui.hotkey(*keys, interval=interval)
+            return self.ok(f"Pressed {'+'.join(keys)}")
+        except Exception as exc:
+            return self.error(f"Key press failed: {exc}")
 
     def mouse_click(self, x: Optional[int] = None,
     y: Optional[int] = None, button: str = "left",
     clicks: int = 1) -> dict:
-import pyautogui
-try:
-    if x is not None and y is not None:
-        pyautogui.click(x=x, y=y, button=button, clicks=clicks)
-    else:
-        pyautogui.click(button=button, clicks=clicks)
-        return self.ok("Mouse click")
-except Exception as exc:
-    return self.error(f"Mouse click failed: {exc}")
+        import pyautogui
+        try:
+            if x is not None and y is not None:
+                pyautogui.click(x=x, y=y, button=button, clicks=clicks)
+            else:
+                pyautogui.click(button=button, clicks=clicks)
+            return self.ok("Mouse click")
+        except Exception as exc:
+            return self.error(f"Mouse click failed: {exc}")
 
     def mouse_move(self, x: int, y: int, duration: float = 0.0) -> dict:
-import pyautogui
-try:
-    pyautogui.moveTo(x, y, duration=duration)
-    return self.ok(f"Moved to ({x},{y})")
-except Exception as exc:
-    return self.error(f"Mouse move failed: {exc}")
+        import pyautogui
+        try:
+            pyautogui.moveTo(x, y, duration=duration)
+            return self.ok(f"Moved to ({x},{y})")
+        except Exception as exc:
+            return self.error(f"Mouse move failed: {exc}")
 
     def scroll(self, amount: int) -> dict:
-import pyautogui
-try:
-    pyautogui.scroll(amount)
-    return self.ok(f"Scrolled {amount}")
-except Exception as exc:
-    return self.error(f"Scroll failed: {exc}")
+        import pyautogui
+        try:
+            pyautogui.scroll(amount)
+            return self.ok(f"Scrolled {amount}")
+        except Exception as exc:
+            return self.error(f"Scroll failed: {exc}")
 
-# ------------------------------------------------------------------ #
-# Screen
-# ------------------------------------------------------------------ #
+    # ------------------------------------------------------------------ #
+    # Screen
+    # ------------------------------------------------------------------ #
     def screenshot(self, path: Optional[str] = None) -> dict:
         """Screenshot via gnome-screenshot / scrot / import fallback."""
-import base64
-try:
-    if path:
-        for tool in (["gnome-screenshot", "-f", path],
-        ["scrot", path],
-        ["import", "-window", "root", path]):
-            if shutil.which(tool[0]):
-                proc = self._run(tool, capture=False)
-                if proc.returncode == 0:
-                    return self.ok(f"Screenshot saved to {path}")
+        import base64
+        try:
+            if path:
+                for tool in (["gnome-screenshot", "-f", path],
+                              ["scrot", path],
+                              ["import", "-window", "root", path]):
+                    if shutil.which(tool[0]):
+                        proc = self._run(tool, capture=False)
+                        if proc.returncode == 0:
+                            return self.ok(f"Screenshot saved to {path}")
                 return self.error("No screenshot tool available")
-                # Return PNG bytes as base64 without saving
-import pyautogui
-img = pyautogui.screenshot()
-buf = io.BytesIO()
-img.save(buf, format="PNG")
-return self.ok("Screenshot captured",
-                image_b64=base64.b64encode(buf.getvalue()).decode())
-except Exception as exc:
-    return self.error(f"Screenshot failed: {exc}")
+            # Return PNG bytes as base64 without saving
+            import pyautogui
+            img = pyautogui.screenshot()
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+            return self.ok("Screenshot captured",
+                            image_b64=base64.b64encode(buf.getvalue()).decode())
+        except Exception as exc:
+            return self.error(f"Screenshot failed: {exc}")
 
     def screen_size(self) -> dict:
-import pyautogui
-try:
-    w, h = pyautogui.size()
-    return self.ok(f"{w}x{h}", width=w, height=h)
-except Exception as exc:
-    return self.error(f"Could not get screen size: {exc}")
+        import pyautogui
+        try:
+            w, h = pyautogui.size()
+            return self.ok(f"{w}x{h}", width=w, height=h)
+        except Exception as exc:
+            return self.error(f"Could not get screen size: {exc}")
 
 # ------------------------------------------------------------------ #
 # System / power / info
@@ -508,7 +509,7 @@ except Exception as exc:
                 if shutil.which(cmd[0]):
                     self._run(cmd, capture=False)
                     return self.ok("Screen locked")
-                return self.error("No lock command available")
+            return self.error("No lock command available")
         except Exception as exc:
             return self.error(f"Lock failed: {exc}")
 
@@ -521,10 +522,10 @@ except Exception as exc:
             args = ["shutdown", f"-{action}", f"+{delay_min}"]
             if force:
                 args = ["shutdown", "-f", f"-{action}", f"+{delay_min}"]
-                proc = self._sudo(args)
-                if proc.returncode == 0:
-                    return self.ok(f"{action} scheduled in {delay_min} min")
-                return self.error(proc.stderr.strip() or "shutdown failed")
+            proc = self._sudo(args)
+            if proc.returncode == 0:
+                return self.ok(f"{action} scheduled in {delay_min} min")
+            return self.error(proc.stderr.strip() or "shutdown failed")
         except Exception as exc:
             return self.error(f"Shutdown failed: {exc}")
 
@@ -608,9 +609,9 @@ except Exception as exc:
                 proc = subprocess.run(
                     ["sudo", "crontab", "-u", "root", "-"],
                     input=new, text=True, capture_output=True)
-                    if proc.returncode == 0:
-                        return self.ok("Cron entry added")
-                    return self.error(proc.stderr.strip() or "crontab failed")
+            if proc.returncode == 0:
+                return self.ok("Cron entry added")
+            return self.error(proc.stderr.strip() or "crontab failed")
         except Exception as exc:
             return self.error(f"Cron failed: {exc}")
 
@@ -620,7 +621,7 @@ except Exception as exc:
                 proc = self._run(["crontab", "-l"])
             else:
                 proc = self._sudo(["crontab", "-l", "-u", "root"])
-                return self.ok("Cron entries", output=proc.stdout)
+            return self.ok("Cron entries", output=proc.stdout)
         except Exception as exc:
             return self.error(f"Cron list failed: {exc}")
 
@@ -660,7 +661,7 @@ except Exception as exc:
                 proc = self._run(["ip", "addr"])
             else:
                 proc = self._run(["ifconfig", "-a"])
-                return self.ok("ip output", output=proc.stdout)
+            return self.ok("ip output", output=proc.stdout)
         except Exception as exc:
             return self.error(f"ip failed: {exc}")
 
@@ -726,18 +727,18 @@ except Exception as exc:
         # ------------------------------------------------------------------ #
     def list_windows(self) -> dict:
         try:
-            if shutil.which("wmctrl"):
-                proc = self._run(["wmctrl", "-l"])
-                windows = []
-                for line in proc.stdout.splitlines():
-                    parts = line.split(None, 3)
-                    if len(parts) >= 4:
-                        windows.append({
-                            "id": parts[0], "desktop": parts[1],
-                            "host": parts[2], "title": parts[3],
-                        })
-                        return self.ok(f"{len(windows)} windows", windows=windows)
-                    return self.error("wmctrl not installed")
+            if not shutil.which("wmctrl"):
+                return self.error("wmctrl not installed")
+            proc = self._run(["wmctrl", "-l"])
+            windows = []
+            for line in proc.stdout.splitlines():
+                parts = line.split(None, 3)
+                if len(parts) >= 4:
+                    windows.append({
+                        "id": parts[0], "desktop": parts[1],
+                        "host": parts[2], "title": parts[3],
+                    })
+            return self.ok(f"{len(windows)} windows", windows=windows)
         except Exception as exc:
             return self.error(f"List windows failed: {exc}")
 
@@ -838,9 +839,9 @@ except Exception as exc:
                     ["sudo", "chpasswd"],
                     input=f"{username}:{password}\n", text=True,
                     capture_output=True)
-                    if chpass.returncode != 0:
-                        return self.error(chpass.stderr.strip() or "chpasswd failed")
-                    return self.ok(f"User '{username}' created")
+                if chpass.returncode != 0:
+                    return self.error(chpass.stderr.strip() or "chpasswd failed")
+            return self.ok(f"User '{username}' created")
         except Exception as exc:
             return self.error(f"add_user failed: {exc}")
 
@@ -851,11 +852,11 @@ except Exception as exc:
             args = ["userdel"]
             if remove_home:
                 args.append("-r")
-                args.append(username)
-                proc = self._sudo(args, password=sudo_password)
-                if proc.returncode == 0:
-                    return self.ok(f"User '{username}' deleted")
-                return self.error(proc.stderr.strip() or "userdel failed")
+            args.append(username)
+            proc = self._sudo(args, password=sudo_password)
+            if proc.returncode == 0:
+                return self.ok(f"User '{username}' deleted")
+            return self.error(proc.stderr.strip() or "userdel failed")
         except Exception as exc:
             return self.error(f"delete_user failed: {exc}")
 

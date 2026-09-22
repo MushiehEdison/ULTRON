@@ -1,9 +1,11 @@
 # STT
 faster-whisper
 sounddevice
+numpy
 
 # Intent parsing
 anthropic
+python-dotenv
 
 # Automation
 pyautogui
@@ -13,6 +15,10 @@ python-xlib; sys_platform == 'linux'
 
 # GUI
 PyQt6
+qtawesome
+
+# Packaging
+pyinstaller
 
 # Testing
 pytest

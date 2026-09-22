@@ -501,7 +501,7 @@ class WindowsAdapter(AutomationAdapter):
     def focus_window(self, title_substr: str) -> dict:
         try:
             result = self.list_windows()
-            if not result.get("ok"):
+            if result.get("status") != "ok":
                 return result
             for w in result["windows"]:
                 if title_substr.lower() in w["title"].lower():

@@ -25,11 +25,11 @@ class FakeAdapter:
         return {"status": "ok", "message": f"changed {key} to {value}"}
 
 
-    @pytest.fixture
-    def dispatcher():
-        d = Dispatcher.__new__(Dispatcher)   # skip __init__'s get_adapter() call
-        d.adapter = FakeAdapter()
-        return d
+@pytest.fixture
+def dispatcher():
+    d = Dispatcher.__new__(Dispatcher)   # skip __init__'s get_adapter() call
+    d.adapter = FakeAdapter()
+    return d
 
 
 def test_unknown_command_is_rejected(dispatcher):
