@@ -5,10 +5,16 @@ set -euo pipefail
 
 pip install -r requirements.txt
 
+# Use an absolute source path for --add-data: PyInstaller resolves relative
+# source paths against --specpath (build/linux here), not the repo root, so
+# a relative path silently breaks once --specpath differs from cwd — which
+# is exactly what was causing "Unable to find .../build/linux/app/gui/assets".
+REPO_ROOT="$(pwd)"
+
 pyinstaller \
   --name ULTRON \
   --onefile \
-  --add-data "app/gui/assets:app/gui/assets" \
+  --add-data "${REPO_ROOT}/app/gui/assets:app/gui/assets" \
   --hidden-import faster_whisper \
   --hidden-import qtawesome \
   --collect-data qtawesome \

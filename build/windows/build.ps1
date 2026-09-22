@@ -9,12 +9,18 @@ if (Test-Path "build/windows/icon.ico") {
     $iconArgs = @("--icon", "build/windows/icon.ico")
 }
 
+# Use an absolute source path for --add-data: PyInstaller resolves relative
+# source paths against --specpath (build/windows here), not the repo root,
+# which can silently break once --specpath differs from cwd (seen on the
+# Linux/macOS builds of this same command).
+$repoRoot = (Get-Location).Path
+
 pyinstaller `
   --name ULTRON `
   --onefile `
   --windowed `
   @iconArgs `
-  --add-data "app/gui/assets;app/gui/assets" `
+  --add-data "$repoRoot/app/gui/assets;app/gui/assets" `
   --hidden-import faster_whisper `
   --hidden-import qtawesome `
   --collect-data qtawesome `

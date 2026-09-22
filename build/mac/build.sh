@@ -5,16 +5,25 @@ set -euo pipefail
 
 pip install -r requirements.txt
 
+# macOS's system bash is 3.2, which throws "unbound variable" when expanding
+# "${ARR[@]}" on an *empty* array under `set -u` (fixed only in bash 4.4+).
+# The ${ARR[@]+"${ARR[@]}"} idiom below expands to nothing if ICON_ARGS is
+# empty/unset, and to the array elements otherwise — safe on bash 3.2+.
 ICON_ARGS=()
 if [ -f "build/mac/icon.icns" ]; then
   ICON_ARGS=(--icon build/mac/icon.icns)
 fi
 
+# Use an absolute source path for --add-data: PyInstaller resolves relative
+# source paths against --specpath (build/mac here), not the repo root, so a
+# relative path silently breaks once --specpath differs from cwd.
+REPO_ROOT="$(pwd)"
+
 pyinstaller \
   --name ULTRON \
   --windowed \
-  "${ICON_ARGS[@]}" \
-  --add-data "app/gui/assets:app/gui/assets" \
+  ${ICON_ARGS[@]+"${ICON_ARGS[@]}"} \
+  --add-data "${REPO_ROOT}/app/gui/assets:app/gui/assets" \
   --hidden-import faster_whisper \
   --hidden-import qtawesome \
   --collect-data qtawesome \
