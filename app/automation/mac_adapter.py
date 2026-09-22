@@ -4,8 +4,6 @@ apps/files and AppleScript (via osascript) where finer control is needed."""
 import subprocess
 import urllib.parse
 
-import pyautogui
-
 from app.automation.base import AutomationAdapter
 
 # Common spoken name -> actual macOS application name (as Spotlight/`open -a` sees it).
@@ -53,6 +51,7 @@ class MacAdapter(AutomationAdapter):
 
     def type_text(self, text: str) -> dict:
         try:
+            import pyautogui
             pyautogui.write(text, interval=0.02)
             return self.ok("Text typed")
         except Exception as exc:

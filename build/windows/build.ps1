@@ -4,11 +4,16 @@ $ErrorActionPreference = "Stop"
 
 pip install -r requirements.txt
 
+$iconArgs = @()
+if (Test-Path "build/windows/icon.ico") {
+    $iconArgs = @("--icon", "build/windows/icon.ico")
+}
+
 pyinstaller `
   --name ULTRON `
   --onefile `
   --windowed `
-  --icon build/windows/icon.ico `
+  @iconArgs `
   --add-data "app/gui/assets;app/gui/assets" `
   --hidden-import faster_whisper `
   --hidden-import qtawesome `

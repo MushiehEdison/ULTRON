@@ -13,3 +13,14 @@ this list — nothing else is valid.
 
 Add new commands here first, then implement them in `app/intent/schema.py`
 and in every platform adapter.
+
+## `change_setting` keys
+
+Every platform adapter guarantees these `key` values for `change_setting`
+(each adapter also supports extra platform-specific keys — see
+`ALLOWED_SETTINGS` in `app/automation/{windows,linux,mac}_adapter.py`):
+
+`wifi`, `bluetooth`, `display`, `sound`, `battery`
+
+`app/intent/schema.py` exposes this common set as `COMMON_SETTINGS` so the
+intent parser doesn't propose a setting no adapter can honor.

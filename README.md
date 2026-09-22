@@ -62,7 +62,8 @@ voice-pc-assistant/
 git clone https://github.com/<org>/voice-pc-assistant.git
 cd voice-pc-assistant
 pip install -r requirements.txt
-python app/main.py
+cp .env.example .env   # add your ANTHROPIC_API_KEY (optional — falls back to an offline parser without it)
+python -m app.main
 ```
 
 ## Contributing

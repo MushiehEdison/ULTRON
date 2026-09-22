@@ -5,10 +5,15 @@ set -euo pipefail
 
 pip install -r requirements.txt
 
+ICON_ARGS=()
+if [ -f "build/mac/icon.icns" ]; then
+  ICON_ARGS=(--icon build/mac/icon.icns)
+fi
+
 pyinstaller \
   --name ULTRON \
   --windowed \
-  --icon build/mac/icon.icns \
+  "${ICON_ARGS[@]}" \
   --add-data "app/gui/assets:app/gui/assets" \
   --hidden-import faster_whisper \
   --hidden-import qtawesome \
