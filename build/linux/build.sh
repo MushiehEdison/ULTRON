@@ -23,8 +23,9 @@ pyinstaller \
   --specpath build/linux \
   app/main.py
 
-# Wrap the PyInstaller binary into a proper Fedora .rpm.
-# Requires `fpm` (gem install fpm) and `rpmbuild` on PATH.
+# Wrap the PyInstaller binary into a proper Fedora .rpm, including a
+# desktop menu entry + icon so it shows up in the app launcher like any
+# other installed app (not just a bare binary on PATH).
 if command -v fpm >/dev/null 2>&1; then
   fpm -s dir -t rpm \
     -n ultron \
@@ -33,8 +34,12 @@ if command -v fpm >/dev/null 2>&1; then
     --license MIT \
     --prefix /usr/local/bin \
     -p build/linux/ultron.rpm \
-    build/linux/dist/ULTRON=ultron
+    build/linux/dist/ULTRON=ultron \
+    build/linux/ultron.desktop=/usr/share/applications/ultron.desktop \
+    "${REPO_ROOT}/app/gui/assets/icon_256.png"=/usr/share/icons/hicolor/256x256/apps/ultron.png
   echo "Done: build/linux/ultron.rpm"
 else
   echo "fpm not found — skipping .rpm packaging. Binary is at build/linux/dist/ULTRON"
+  echo "To still get an app-menu icon without building an rpm, run:"
+  echo "  bash build/linux/install_local.sh"
 fi

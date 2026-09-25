@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ULTRON
+Comment=Voice-controlled automation assistant
+Exec=/usr/local/bin/ultron
+Icon=ultron
+Terminal=false
+Categories=Utility;
+StartupWMClass=ULTRON

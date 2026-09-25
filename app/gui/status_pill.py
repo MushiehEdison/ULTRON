@@ -70,7 +70,7 @@ class StatusPill(QLabel):
             "listening": "LISTENING",
             "thinking": "THINKING",
             "speaking": "SPEAKING",
-            "error": "NEEDS CONFIRMATION",
+            "error": "ATTENTION",
         }
         self.setText(labels.get(state, state.upper()))
 
