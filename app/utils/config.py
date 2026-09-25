@@ -15,6 +15,7 @@ any of these, e.g.:
 
     ANTHROPIC_API_KEY=sk-ant-...
     ULTRON_INTENT_MODEL=claude-haiku-4-5-20251001
+    ULTRON_OFFLINE_INTENT_MODEL=qwen-intent
     ULTRON_STT_MODEL_SIZE=small
 """
 
@@ -59,11 +60,39 @@ def _env_bool(key: str, default: bool) -> bool:
 
 @dataclass(frozen=True)
 class Config:
-    # ---- Intent parsing (LLM) --------------------------------------------
+    # ---- Intent parsing (cloud LLM) ----------------------------------------
     anthropic_api_key: str = field(default_factory=lambda: os.environ.get("ANTHROPIC_API_KEY", ""))
     intent_model: str = field(default_factory=lambda: _env_str("ULTRON_INTENT_MODEL", "claude-haiku-4-5-20251001"))
     intent_max_tokens: int = field(default_factory=lambda: _env_int("ULTRON_INTENT_MAX_TOKENS", 300))
     intent_timeout_seconds: float = field(default_factory=lambda: _env_float("ULTRON_INTENT_TIMEOUT", 8.0))
+
+    # ---- Intent parsing (offline LLM -- Ollama daemon) ---------------------
+    # The parser talks to a local Ollama server over HTTP. Install Ollama,
+    # then `ollama pull qwen2.5:0.5b-instruct` (or register a tuned variant
+    # via a Modelfile and set ULTRON_OFFLINE_INTENT_MODEL to its name).
+    # Bump to qwen2.5:1.5b-instruct if the 0.5B model misfires on multi-step
+    # phrasing too often -- it's a one-line env change, not a code change.
+    offline_intent_model: str = field(default_factory=lambda: _env_str(
+        "ULTRON_OFFLINE_INTENT_MODEL", "qwen2.5:0.5b-instruct"
+    ))
+    offline_intent_max_history: int = field(default_factory=lambda: _env_int(
+        "ULTRON_OFFLINE_INTENT_MAX_HISTORY", 2
+    ))
+    offline_intent_temperature: float = field(default_factory=lambda: _env_float(
+        "ULTRON_OFFLINE_INTENT_TEMPERATURE", 0.1
+    ))
+    offline_intent_num_predict: int = field(default_factory=lambda: _env_int(
+        "ULTRON_OFFLINE_INTENT_NUM_PREDICT", 256
+    ))
+    offline_intent_num_ctx: int = field(default_factory=lambda: _env_int(
+        "ULTRON_OFFLINE_INTENT_NUM_CTX", 1024
+    ))
+    offline_intent_host: str = field(default_factory=lambda: _env_str(
+        "ULTRON_OFFLINE_INTENT_HOST", "http://127.0.0.1:11434"
+    ))
+    offline_intent_timeout_seconds: float = field(default_factory=lambda: _env_float(
+        "ULTRON_OFFLINE_INTENT_TIMEOUT", 5.0
+    ))
 
     # ---- Speech-to-text ----------------------------------------------------
     stt_model_size: str = field(default_factory=lambda: _env_str("ULTRON_STT_MODEL_SIZE", "base"))
@@ -86,9 +115,24 @@ class Config:
 
     def has_llm(self) -> bool:
         """Whether a real Anthropic API key is configured. When False,
-        app/intent/parser.py falls back to its offline rule-based parser
-        instead of failing the whole pipeline."""
+        app/intent/parser.py falls back to the offline LLM (if available)
+        or the rule-based parser instead of failing the whole pipeline."""
         return bool(self.anthropic_api_key)
+
+    def has_offline_llm(self) -> bool:
+        """Whether a local Ollama daemon is reachable. Cheap TCP probe;
+        no model load and no per-call cost. The parser will fall back to
+        regex if the daemon is missing or the model isn't pulled."""
+        import socket
+        from urllib.parse import urlparse
+        try:
+            parsed = urlparse(self.offline_intent_host)
+            host = parsed.hostname or "127.0.0.1"
+            port = parsed.port or 11434
+            with socket.create_connection((host, port), timeout=0.25):
+                return True
+        except OSError:
+            return False
 
 
 config = Config()
